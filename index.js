@@ -19,6 +19,7 @@ function bind(el, binding, vnode) {
   var vm = vnode.context;
 
   var callback = binding.value;
+  var useCapture = binding.modifiers.useCapture
   if (typeof callback !== 'function') {
     if (process.env.NODE_ENV !== 'production') {
       Vue.util.warn(
@@ -43,7 +44,7 @@ function bind(el, binding, vnode) {
   }, 0);
 
   el[HANDLER] = function(ev) {
-    // @NOTE: this test used to be just `el.containts`, but working with path is better,
+    // @NOTE: this test used to be just `el.contains`, but working with path is better,
     //        because it tests whether the element was there at the time of
     //        the click, not whether it is there now, that the event has arrived
     //        to the top.
@@ -53,12 +54,13 @@ function bind(el, binding, vnode) {
       return callback.call(vm, ev);
     }
   };
+  el[HANDLER+"_useCapture"] = useCapture;
 
-  document.documentElement.addEventListener('click', el[HANDLER], false);
+  document.documentElement.addEventListener('click', el[HANDLER], el[HANDLER+"_useCapture"]);
 }
 
 function unbind(el) {
-  document.documentElement.removeEventListener('click', el[HANDLER], false);
+  document.documentElement.removeEventListener('click', el[HANDLER], el[HANDLER+"_useCapture"]);
   delete el[HANDLER];
 }
 

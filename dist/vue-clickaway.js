@@ -21,6 +21,7 @@
     var vm = vnode.context;
 
     var callback = binding.value;
+    var useCapture = binding.modifiers.useCapture
     if (typeof callback !== 'function') {
       if ('development' !== 'production') {
         Vue.util.warn(
@@ -55,12 +56,13 @@
         return callback.call(vm, ev);
       }
     };
+    el[HANDLER+"_useCapture"] = useCapture;
 
-    document.documentElement.addEventListener('click', el[HANDLER], false);
+    document.documentElement.addEventListener('click', el[HANDLER], el[HANDLER+"_useCapture"]);
   }
 
   function unbind(el) {
-    document.documentElement.removeEventListener('click', el[HANDLER], false);
+    document.documentElement.removeEventListener('click', el[HANDLER], el[HANDLER+"_useCapture"]);
     delete el[HANDLER];
   }
 
