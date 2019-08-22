@@ -54,13 +54,23 @@ function bind(el, binding, vnode) {
       return callback.call(vm, ev);
     }
   };
+  el[HANDLER+"_iframe-handler"] = function(ev) {
+      var activeElement = document.activeElement;
+      // if we clicked on an iframe
+      if (activeElement.tagName.toLowerCase() == 'iframe') {
+          // Call the original handler
+          el[HANDLER](ev);
+      }
+  };
   el[HANDLER+"_useCapture"] = useCapture;
 
   document.documentElement.addEventListener('click', el[HANDLER], el[HANDLER+"_useCapture"]);
+  window.addEventListener('blur', el[HANDLER+"_iframe-handler"], el[HANDLER+"_useCapture"]);
 }
 
 function unbind(el) {
   document.documentElement.removeEventListener('click', el[HANDLER], el[HANDLER+"_useCapture"]);
+  window.removeEventListener('blur', el[HANDLER+"_iframe-handler"], el[HANDLER+"_useCapture"]);
   delete el[HANDLER];
 }
 
